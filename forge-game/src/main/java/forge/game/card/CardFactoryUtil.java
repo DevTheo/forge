@@ -3437,7 +3437,19 @@ public class CardFactoryUtil {
             st.setSVar("AffinityX", "Count$Valid " + t + ".YouCtrl");
             inst.addStaticAbility(st);
         } else if (keyword.startsWith("Blitz")) {
-            String effect = "Mode$ Continuous | Affected$ Card.Self+blitzed | AddKeyword$ Haste | AddTrigger$ Dies";
+            final String[] k = keyword.split(":");
+            final String manacost = k[1];
+            final Cost cost = new Cost(manacost, false);
+
+            StringBuilder sb = new StringBuilder("Blitz");
+            if (!cost.isOnlyManaCost()) {
+                sb.append("—");
+            } else {
+                sb.append(" ");
+            }
+            sb.append(cost.toSimpleString());
+            String effect = "Mode$ Continuous | Affected$ Card.Self+blitzed+castKeyword | AddKeyword$ Haste | AddTrigger$ Dies"
+                    + " | Secondary$ True | Description$ " + sb.toString() + " (" + inst.getReminderText() + ")";
             String trig = "Mode$ ChangesZone | Origin$ Battlefield | Destination$ Graveyard | ValidCard$ Card.Self | " +
                     "Execute$ TrigDraw | TriggerDescription$ When this creature dies, draw a card.";
             String ab = "DB$ Draw | NumCards$ 1";
